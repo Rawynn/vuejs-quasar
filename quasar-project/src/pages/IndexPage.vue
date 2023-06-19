@@ -1,7 +1,6 @@
 <template>
   <div class="q-pa-md">
     <h1 class="text-center">User list</h1>
-
     <div class="user-list-holder">
       <q-input
         outlined
@@ -11,19 +10,36 @@
         @input="searchUsers"
       ></q-input>
 
-      <user-list :users="filteredUsers" :search-query="searchQuery"></user-list>
+      <user-list
+        v-if="!searchQuery"
+        :users="users"
+        :search-query="searchQuery"
+      ></user-list>
+      <user-list
+        v-else
+        :users="searchedUsers"
+        :search-query="searchQuery"
+      ></user-list>
 
       <q-pagination
+        v-if="!searchQuery"
         v-model="currentPage"
         :min="1"
         :max="totalPages"
         :input="true"
         @input="fetchUsers"
       ></q-pagination>
+      <q-pagination
+        v-else
+        v-model="searchedCurrentPage"
+        :min="1"
+        :max="searchedTotalPages"
+        :input="true"
+        @input="fetchSearchedUsers"
+      ></q-pagination>
     </div>
   </div>
 </template>
-
 <script>
 import axios from "axios";
 import UserList from "@/components/UserList.vue";
@@ -41,6 +57,11 @@ export default {
       cache: new Map(),
       searchQuery: "",
       favorites: [],
+      searchedUsers: [],
+      searchedCurrentPage: 1,
+      searchedPerPage: 0,
+      searchedTotalUsers: 0,
+      searchedCache: new Map(),
     };
   },
   computed: {
@@ -57,6 +78,9 @@ export default {
     },
     totalPages() {
       return Math.ceil(this.totalUsers / this.perPage);
+    },
+    searchedTotalPages() {
+      return Math.ceil(this.searchedTotalUsers / this.searchedPerPage);
     },
   },
   mounted() {
@@ -115,6 +139,44 @@ export default {
       this.currentPage = 1;
       this.fetchUsers();
     },
+
+    fetchSearchedUsers() {
+      const cacheKey = `${this.searchQuery}`;
+      if (this.searchedCache.has(cacheKey)) {
+        this.searchedUsers = this.searchedCache.get(cacheKey);
+        this.searchedTotalUsers = this.searchedCache.get("total");
+        this.searchedPerPage = this.searchedCache.get("perPage");
+      } else {
+        // Clear the cache if the search query or page has changed
+        if (this.searchQuery !== this.searchedCache.get("searchQuery")) {
+          this.searchedCache.clear();
+        }
+
+        axios
+          .get("https://reqres.in/api/users", {
+            params: {
+              page: 1,
+              per_page: 1000, // Assuming a high value to get all results at once
+              q: this.searchQuery,
+            },
+          })
+          .then((response) => {
+            this.searchedUsers = response.data.data;
+            this.searchedTotalUsers = response.data.total;
+            this.searchedPerPage = response.data.per_page;
+
+            // Update the cache
+            this.searchedCache.set(cacheKey, this.searchedUsers);
+            this.searchedCache.set("total", this.searchedTotalUsers);
+            this.searchedCache.set("perPage", this.searchedPerPage);
+            this.searchedCache.set("searchQuery", this.searchQuery);
+          })
+          .catch((error) => {
+            console.error(error);
+          });
+      }
+    },
+
     isFavorite(userId) {
       return this.favorites.includes(userId);
     },
@@ -143,6 +205,10 @@ export default {
       } else {
         this.fetchUsers();
       }
+    },
+    searchQuery() {
+      this.searchedCurrentPage = 1;
+      this.fetchSearchedUsers();
     },
   },
 };
