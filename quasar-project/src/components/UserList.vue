@@ -1,15 +1,21 @@
 <template>
-  <div>
-    <ul>
-      <li v-for="user in filteredUsers" :key="user.id">
-        <q-avatar :src="user.avatar"></q-avatar>
+  <ul class="user-list">
+    <li class="list-element" v-for="user in filteredUsers" :key="user.id">
+      <div class="avatar-name-holder">
+        <q-avatar class="list-avatar" :src="user.avatar">
+          <q-img :src="user.avatar" :alt="user.first_name"></q-img>
+        </q-avatar>
         <router-link :to="{ name: 'UserDetails', params: { userId: user.id } }">
           {{ user.first_name }} {{ user.last_name }}
         </router-link>
-        <favorite-button :user-id="user.id"></favorite-button>
-      </li>
-    </ul>
-  </div>
+      </div>
+
+      <favorite-button
+        class="list-favorite"
+        :user-id="user.id"
+      ></favorite-button>
+    </li>
+  </ul>
 </template>
 
 <script>
@@ -44,9 +50,3 @@ export default {
   },
 };
 </script>
-
-<style scoped>
-.cursor-pointer {
-  cursor: pointer;
-}
-</style>

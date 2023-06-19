@@ -2,7 +2,7 @@
   <q-icon
     :name="isFavorite ? 'star' : 'star_border'"
     @click="toggleFavorite"
-    class="cursor-pointer"
+    class="cursor-pointer star"
   ></q-icon>
 </template>
 
@@ -48,9 +48,3 @@ export default {
   },
 };
 </script>
-
-<style>
-.cursor-pointer {
-  cursor: pointer;
-}
-</style>

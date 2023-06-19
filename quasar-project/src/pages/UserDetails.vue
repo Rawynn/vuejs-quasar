@@ -1,22 +1,33 @@
 <template>
   <div class="q-pa-md">
-    <h1>User Details</h1>
-    <div v-if="user">
-      <q-avatar>
-        <q-img
-          :src="user.avatar"
-          :alt="user.first_name"
-          class="user-avatar"
-        ></q-img>
-      </q-avatar>
+    <h1 class="text-center">User Details</h1>
+    <div class="user-card" v-if="user">
+      <div class="avatar-holder">
+        <q-avatar size="150px">
+          <q-img
+            :src="user.avatar"
+            :alt="user.first_name"
+            class="user-avatar"
+          ></q-img>
+        </q-avatar>
+        <favorite-button :user-id="user.id"></favorite-button>
+      </div>
+
       <h2>{{ user.first_name }} {{ user.last_name }}</h2>
-      <p>Email: {{ user.email }}</p>
-      <favorite-button :user-id="user.id"></favorite-button>
+      <p class="mail-holder">
+        <q-icon class="mail-icon" name="mail"></q-icon>
+        <a v-bind:href="'mailto:' + user.email">{{ user.email }}</a>
+      </p>
     </div>
-    <div v-else>
+    <div v-else class="text-center">
       <p>Loading user details...</p>
     </div>
-    <q-btn color="primary" label="Back to List" @click="goBackToList" />
+
+    <q-btn
+      class="btn-center btn-primary"
+      label="Back to List"
+      @click="goBackToList"
+    />
   </div>
 </template>
 
@@ -75,9 +86,3 @@ export default {
   },
 };
 </script>
-
-<style>
-.cursor-pointer {
-  cursor: pointer;
-}
-</style>

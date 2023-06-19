@@ -1,24 +1,26 @@
 <template>
   <div class="q-pa-md">
-    <h1>User</h1>
+    <h1 class="text-center">User list</h1>
 
-    <q-input
-      outlined
-      dense
-      v-model="searchQuery"
-      placeholder="Search..."
-      @input="searchUsers"
-    ></q-input>
+    <div class="user-list-holder">
+      <q-input
+        outlined
+        dense
+        v-model="searchQuery"
+        placeholder="Search..."
+        @input="searchUsers"
+      ></q-input>
 
-    <user-list :users="filteredUsers" :search-query="searchQuery"></user-list>
+      <user-list :users="filteredUsers" :search-query="searchQuery"></user-list>
 
-    <q-pagination
-      v-model="currentPage"
-      :min="1"
-      :max="totalPages"
-      :input="true"
-      @input="fetchUsers"
-    ></q-pagination>
+      <q-pagination
+        v-model="currentPage"
+        :min="1"
+        :max="totalPages"
+        :input="true"
+        @input="fetchUsers"
+      ></q-pagination>
+    </div>
   </div>
 </template>
 
